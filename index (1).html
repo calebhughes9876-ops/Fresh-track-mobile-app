@@ -1,0 +1,2257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshTrack - Pantry Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #F1F5F9;
+  --surface:      #FFFFFF;
+  --surface-2:    #F8FAFC;
+  --primary:      #15803D;
+  --primary-mid:  #16A34A;
+  --primary-dark: #0F172A;
+  --accent:       #F59E0B;
+  --danger:       #EF4444;
+  --warning:      #F97316;
+  --success:      #22C55E;
+  --text:         #0F172A;
+  --text-muted:   #64748B;
+  --border:       #E2E8F0;
+  --cat-dairy:    #3B82F6;
+  --cat-meat:     #EF4444;
+  --cat-produce:  #22C55E;
+  --cat-pantry:   #A16207;
+  --cat-leftovers:#8B5CF6;
+  --cat-beverages:#06B6D4;
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+.header {
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.logo-text .app-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+
+.logo-text .app-tagline {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-top: 2px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.icon-btn.active-notif { background: rgba(245,158,11,0.3); border-color: var(--accent); color: var(--accent); }
+
+/* ── NOTIFICATION BANNER ─────────────────────── */
+.notif-banner {
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 28px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-banner.hidden { display: none; }
+
+.btn-enable-notif {
+  padding: 5px 14px;
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-enable-notif:hover { background: rgba(255,255,255,0.35); }
+
+/* ── STATS BAR ───────────────────────────────── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px 24px 0;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+}
+
+.stat-card.warn { border-left-color: var(--warning); }
+.stat-card.danger { border-left-color: var(--danger); }
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -1px;
+  transition: all 0.3s;
+}
+.stat-card.warn .stat-number  { color: var(--warning); }
+.stat-card.danger .stat-number { color: var(--danger); }
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.2px;
+}
+
+/* ── MAIN LAYOUT ─────────────────────────────── */
+.main {
+  padding: 20px 24px 110px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* ── SECTION HEAD ────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  margin-top: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.sort-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.item-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+}
+
+.sort-select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+
+/* ── FILTER TABS ─────────────────────────────── */
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.12s;
+}
+
+.filter-tab:hover { border-color: var(--primary); color: var(--primary); background: #F0FDF4; }
+.filter-tab.active { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+
+/* ── ITEMS GRID ──────────────────────────────── */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--text-muted);
+}
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.empty-state p { font-size: 14px; }
+
+/* ── ITEM CARD ───────────────────────────────── */
+.item-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.18s;
+  animation: cardIn 0.25s ease forwards;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.item-card.status-expired  { border-left-color: var(--danger); }
+.item-card.status-critical { border-left-color: var(--danger); }
+.item-card.status-soon     { border-left-color: var(--warning); }
+.item-card.status-ok       { border-left-color: var(--primary); }
+.item-card.status-fresh    { border-left-color: var(--success); }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.item-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  flex: 1;
+  margin-right: 8px;
+  letter-spacing: -0.1px;
+}
+
+.delete-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.12s;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+.item-card:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { background: #FEE2E2; color: var(--danger); }
+
+.category-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.cat-dairy      { background: var(--cat-dairy); }
+.cat-meat       { background: var(--cat-meat); }
+.cat-produce    { background: var(--cat-produce); }
+.cat-pantry     { background: var(--cat-pantry); }
+.cat-leftovers  { background: var(--cat-leftovers); }
+.cat-beverages  { background: var(--cat-beverages); }
+
+.expiry-display {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.days-number {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+  transition: color 0.2s;
+}
+
+.status-expired  .days-number,
+.status-critical .days-number { color: var(--danger); }
+.status-soon     .days-number { color: var(--warning); }
+.status-ok       .days-number { color: var(--primary); }
+.status-fresh    .days-number { color: var(--success); }
+
+.days-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.today-label {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--danger);
+  letter-spacing: -0.5px;
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+.status-critical .days-number,
+.status-expired  .days-number,
+.today-label { animation: pulse-red 2s ease-in-out infinite; }
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.item-quantity { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.expiry-date   { font-size: 11px; color: var(--text-muted); }
+
+.nutrition-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.nut-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #F0FDF4;
+  border: 1px solid #DCFCE7;
+  border-radius: 6px;
+  padding: 3px 8px;
+  line-height: 1.2;
+}
+.nut-chip b    { font-size: 12px; font-weight: 700; color: var(--primary); }
+.nut-chip span { font-size: 9px; color: var(--text-muted); font-weight: 600; }
+
+/* ── FAB ─────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--primary-dark);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s;
+  z-index: 200;
+  line-height: 1;
+}
+.fab:hover { background: #1E293B; transform: scale(1.06); }
+.fab.open  { transform: rotate(45deg); }
+
+/* ── ADD PANEL ───────────────────────────────── */
+.add-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 160;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  backdrop-filter: blur(2px);
+}
+.add-overlay.visible { opacity: 1; pointer-events: all; }
+
+.add-panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 24px 32px;
+  z-index: 170;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  max-width: 480px;
+  margin: 0 auto;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.add-panel.visible { transform: translateY(0); }
+
+.panel-drag {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+
+.panel-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.form-grid .full { grid-column: 1 / -1; }
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21,128,61,0.1);
+  background: #fff;
+}
+.form-group input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: var(--primary-dark);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.1s;
+  letter-spacing: 0.1px;
+}
+.btn-primary:hover  { background: #1E293B; }
+.btn-primary:active { transform: scale(0.99); }
+
+/* ── DINNER SECTION ──────────────────────────── */
+.dinner-section {
+  margin-top: 34px;
+  background: var(--primary);
+  border-radius: 20px;
+  padding: 26px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.dinner-section::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.dinner-section::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -30px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+}
+
+.dinner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.dinner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.dinner-subtitle { font-size: 12px; opacity: 0.65; letter-spacing: 0.3px; }
+
+.btn-dinner {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.btn-dinner:hover   { filter: brightness(1.12); }
+.btn-dinner:active  { transform: scale(0.97); }
+.btn-dinner:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.dinner-content { position: relative; z-index: 1; }
+
+.dinner-placeholder {
+  text-align: center;
+  padding: 22px 12px;
+  opacity: 0.5;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 24px;
+}
+.spinner {
+  width: 34px; height: 34px;
+  border: 3px solid rgba(255,255,255,0.18);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin: 0 auto 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.meal-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.meal-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  transition: background 0.15s;
+  animation: cardIn 0.35s ease forwards;
+}
+.meal-card:hover { background: rgba(255,255,255,0.15); }
+
+.meal-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+.meal-desc { font-size: 12px; opacity: 0.72; line-height: 1.45; }
+
+.meal-ingredients {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.meal-ing-tag {
+  font-size: 10px;
+  padding: 2px 9px;
+  background: rgba(255,255,255,0.16);
+  border-radius: 100px;
+  font-weight: 600;
+}
+
+.dinner-error {
+  text-align: center;
+  padding: 16px;
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+/* ── QR MODAL ────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+
+.modal-box {
+  background: var(--surface);
+  border-radius: 22px;
+  padding: 34px;
+  text-align: center;
+  max-width: 320px;
+  width: 92%;
+  transform: scale(0.88);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.visible .modal-box { transform: scale(1); }
+
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.modal-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+}
+
+.qr-url-group {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+}
+.qr-url-input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+.qr-url-input:focus { border-color: var(--primary-mid); }
+
+.btn-regen-qr {
+  padding: 9px 14px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-regen-qr:hover { background: var(--primary-mid); }
+
+#qr-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+  min-height: 208px;
+  align-items: center;
+}
+
+#qr-container canvas,
+#qr-container img {
+  border-radius: 10px;
+  border: 6px solid var(--bg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.btn-close-modal {
+  padding: 11px 28px;
+  background: var(--surface-2);
+  border: none;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-close-modal:hover { background: var(--border); }
+
+/* ── SCAN BUTTON (inside add panel) ─────────── */
+.btn-scan-item {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px dashed var(--primary-mid);
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.2px;
+}
+.btn-scan-item:hover { background: rgba(30,61,8,0.06); border-style: solid; }
+
+/* ── CAMERA OVERLAY ──────────────────────────── */
+.cam-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.cam-overlay.visible { opacity: 1; pointer-events: all; }
+
+.cam-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
+}
+
+.cam-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.btn-close-cam {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.btn-close-cam:hover { background: rgba(255,255,255,0.22); }
+
+#cam-video {
+  width: 100%;
+  max-width: 520px;
+  max-height: 58vh;
+  object-fit: cover;
+  border-radius: 18px;
+  display: block;
+}
+
+#cam-canvas { display: none; }
+
+.cam-guide {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -62%);
+  width: 260px; height: 200px;
+  border: 2px solid rgba(255,255,255,0.7);
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.35);
+}
+
+.cam-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 24px 24px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 70%, transparent);
+}
+
+.cam-hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.btn-capture {
+  width: 74px; height: 74px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: rgba(255,255,255,0.18);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+}
+.btn-capture::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: #fff;
+  transition: opacity 0.15s;
+}
+.btn-capture:active { transform: scale(0.9); }
+.btn-capture:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.cam-status {
+  font-size: 13px;
+  color: rgba(255,255,255,0.88);
+  text-align: center;
+  font-weight: 500;
+  min-height: 18px;
+}
+
+.cam-spinner {
+  width: 28px; height: 28px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin: 0 auto;
+}
+
+.cam-result-card {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-align: center;
+  color: #fff;
+  width: 90%;
+  max-width: 320px;
+  animation: cardIn 0.3s ease forwards;
+}
+
+.cam-result-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.cam-result-meta {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-bottom: 4px;
+}
+
+.cam-result-note {
+  font-size: 11px;
+  opacity: 0.55;
+  font-style: italic;
+  margin-bottom: 14px;
+}
+
+.cam-result-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+.btn-use-result {
+  padding: 10px 22px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.btn-use-result:hover { filter: brightness(1.12); }
+
+.btn-retry {
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── AUTH SCREEN ─────────────────────────────── */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--primary-dark);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transition: opacity 0.3s;
+}
+.auth-overlay.hidden { opacity: 0; pointer-events: none; }
+
+.auth-box {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 400px;
+  animation: cardIn 0.35s ease forwards;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.auth-logo-icon {
+  width: 38px; height: 38px;
+  background: var(--primary);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.auth-logo-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.auth-tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+.auth-heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  margin-bottom: 4px;
+}
+.auth-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+
+.auth-form .form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
+}
+.auth-form .form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.auth-form .form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21,128,61,0.1);
+  background: #fff;
+}
+.auth-form .form-group input.error { border-color: var(--danger); }
+
+.auth-error {
+  font-size: 12px;
+  color: var(--danger);
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: none;
+}
+.auth-error.visible { display: block; }
+
+.btn-auth {
+  width: 100%;
+  padding: 13px;
+  background: var(--primary-dark);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.12s;
+  letter-spacing: 0.1px;
+}
+.btn-auth:hover { background: #1E293B; }
+
+.auth-divider {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 4px 0;
+  position: relative;
+}
+
+/* User avatar in header */
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-chip:hover { background: rgba(255,255,255,0.14); }
+
+.user-avatar {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.user-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 640px) {
+  .stats-bar    { gap: 10px; padding: 16px 16px 0; }
+  .stat-number  { font-size: 28px; }
+  .stat-label   { font-size: 9px; }
+  .main         { padding: 16px 16px 110px; }
+  .items-grid   { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid    { grid-template-columns: 1fr; }
+  .form-grid .full { grid-column: 1; }
+  .header       { padding: 0 16px; }
+  .dinner-header { flex-direction: column; gap: 12px; }
+  .btn-dinner   { margin-left: 0; width: 100%; }
+  .fab          { bottom: 22px; right: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🥬</div>
+      <span class="auth-logo-name">FreshTrack</span>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="auth-login">
+      <div class="auth-heading">Welcome back</div>
+      <div class="auth-sub">Sign in to your pantry</div>
+      <div class="auth-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="you@email.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" />
+        </div>
+        <div class="auth-error" id="login-error"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:-4px">
+          <input type="checkbox" id="login-remember" style="width:15px;height:15px;accent-color:var(--primary);cursor:pointer;" />
+          <label for="login-remember" style="font-size:13px;color:var(--text-muted);cursor:pointer;font-weight:500;margin:0">Remember me</label>
+        </div>
+        <button class="btn-auth" onclick="doLogin()">Sign In</button>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="auth-signup" style="display:none">
+      <div class="auth-heading">Create your account</div>
+      <div class="auth-sub">Start tracking your pantry</div>
+      <div class="auth-form">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="signup-name" placeholder="Your name" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="signup-email" placeholder="you@email.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" placeholder="Min 6 characters" autocomplete="new-password" />
+        </div>
+        <div class="auth-error" id="signup-error"></div>
+        <button class="btn-auth" onclick="doSignup()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION BANNER -->
+<div class="notif-banner hidden" id="notif-banner">
+  <span>Enable notifications to receive expiry reminders for your pantry items.</span>
+  <button class="btn-enable-notif" onclick="enableNotifications()">Enable</button>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo-mark">
+    <div class="logo-icon">&#127807;</div>
+    <div class="logo-text">
+      <div class="app-name">FreshTrack</div>
+      <div class="app-tagline">Pantry Intelligence</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="notif-btn" title="Notifications" onclick="toggleNotifBanner()">&#128276;</button>
+    <button class="icon-btn" title="Share via QR Code" onclick="showQR()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+        <path d="M14 14h3v3h-3zM17 17h3v3h-3zM14 20h3"/>
+      </svg>
+    </button>
+    <div class="user-chip" id="user-chip" onclick="doLogout()" title="Sign out">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <span class="user-name" id="user-name-display">Guest</span>
+    </div>
+  </div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-number" id="stat-total">0</div>
+    <div class="stat-label">Total Items</div>
+  </div>
+  <div class="stat-card warn">
+    <div class="stat-number" id="stat-soon">0</div>
+    <div class="stat-label">Expiring Soon</div>
+  </div>
+  <div class="stat-card danger">
+    <div class="stat-number" id="stat-expired">0</div>
+    <div class="stat-label">Expired</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="section-head">
+    <span class="section-title">Your Pantry</span>
+    <div class="sort-group">
+      <span class="item-count" id="item-count"></span>
+      <select class="sort-select" id="sort-select" onchange="setSort(this.value)">
+        <option value="expiry">Sort: Expiry</option>
+        <option value="name">Sort: Name</option>
+        <option value="category">Sort: Category</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-tab" onclick="setFilter('dairy', this)">Dairy</button>
+    <button class="filter-tab" onclick="setFilter('meat', this)">Meat</button>
+    <button class="filter-tab" onclick="setFilter('produce', this)">Produce</button>
+    <button class="filter-tab" onclick="setFilter('pantry', this)">Pantry</button>
+    <button class="filter-tab" onclick="setFilter('leftovers', this)">Leftovers</button>
+    <button class="filter-tab" onclick="setFilter('beverages', this)">Beverages</button>
+  </div>
+
+  <div class="items-grid" id="items-grid"></div>
+
+  <!-- DINNER GENERATOR -->
+  <div class="dinner-section">
+    <div class="dinner-header">
+      <div>
+        <div class="dinner-title">What's for Dinner?</div>
+        <div class="dinner-subtitle">AI-generated meal ideas from your expiring ingredients</div>
+      </div>
+      <button class="btn-dinner" id="dinner-btn" onclick="suggestMeal()">Generate Ideas</button>
+    </div>
+    <div class="dinner-content" id="dinner-content">
+      <div class="dinner-placeholder">Press "Generate Ideas" to get meal suggestions based on what needs using up first.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="togglePanel()" title="Add pantry item">+</button>
+
+<!-- ADD PANEL OVERLAY -->
+<div class="add-overlay" id="add-overlay" onclick="closePanel()"></div>
+
+<!-- ADD PANEL -->
+<div class="add-panel" id="add-panel">
+  <div class="panel-drag"></div>
+  <div class="panel-title">Add to Pantry</div>
+  <button class="btn-scan-item" onclick="openCamera()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    Scan Label with Camera
+  </button>
+  <div class="form-grid">
+    <div class="form-group full">
+      <label>Item Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Whole Milk" />
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="f-category">
+        <option value="dairy">Dairy</option>
+        <option value="meat">Meat</option>
+        <option value="produce">Produce</option>
+        <option value="pantry">Pantry</option>
+        <option value="leftovers">Leftovers</option>
+        <option value="beverages">Beverages</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Quantity</label>
+      <input type="text" id="f-quantity" placeholder="e.g. 500g" />
+    </div>
+    <div class="form-group full">
+      <label>Expiry Date</label>
+      <input type="date" id="f-expiry" />
+    </div>
+    <div class="form-group">
+      <label>Calories (kcal)</label>
+      <input type="number" id="f-calories" placeholder="e.g. 250" min="0" />
+    </div>
+    <div class="form-group">
+      <label>Protein (g)</label>
+      <input type="number" id="f-protein" placeholder="e.g. 18" min="0" step="0.1" />
+    </div>
+    <div class="form-group">
+      <label>Total Fat (g)</label>
+      <input type="number" id="f-fat" placeholder="e.g. 9" min="0" step="0.1" />
+    </div>
+    <div class="form-group">
+      <label>Carbohydrates (g)</label>
+      <input type="number" id="f-carbs" placeholder="e.g. 30" min="0" step="0.1" />
+    </div>
+  </div>
+  <button class="btn-primary" onclick="submitItem()">Add to Pantry</button>
+</div>
+
+<!-- CAMERA OVERLAY -->
+<div class="cam-overlay" id="cam-overlay">
+  <div class="cam-header">
+    <span class="cam-title">Scan Food Label</span>
+    <button class="btn-close-cam" onclick="closeCamera()">&#10005;</button>
+  </div>
+  <video id="cam-video" autoplay playsinline muted></video>
+  <canvas id="cam-canvas"></canvas>
+  <div class="cam-guide" id="cam-guide"></div>
+  <div class="cam-footer">
+    <div class="cam-hint" id="cam-hint">Point at the nutrition label or back of pack, then tap the button</div>
+    <div id="cam-result-area"></div>
+    <button class="btn-capture" id="btn-capture" onclick="captureAndAnalyse()" title="Capture"></button>
+    <div class="cam-status" id="cam-status"></div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="modal-overlay" id="qr-modal">
+  <div class="modal-box">
+    <div class="modal-title">Share FreshTrack</div>
+    <div class="modal-sub">Scan this code to open the app on another device</div>
+    <div class="qr-url-group">
+      <input type="text" class="qr-url-input" id="qr-url-input" placeholder="Enter URL to encode" />
+      <button class="btn-regen-qr" onclick="generateQR()">Generate</button>
+    </div>
+    <div id="qr-container"></div>
+    <button class="btn-close-modal" onclick="closeQR()">Close</button>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  STATE
+// ================================================================
+let items       = [];
+let nextId      = 1;
+let activeFilter = 'all';
+let activeSort   = 'expiry';
+let notifEnabled = false;
+
+// ================================================================
+//  DATE UTILITIES
+// ================================================================
+function offsetDate(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function getDays(dateStr) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const exp = new Date(dateStr + 'T00:00:00');
+  return Math.round((exp - today) / 86400000);
+}
+
+function fmtDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function getStatus(days) {
+  if (days < 0)  return 'expired';
+  if (days <= 2) return 'critical';
+  if (days <= 5) return 'soon';
+  if (days <= 14) return 'ok';
+  return 'fresh';
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ================================================================
+//  SAMPLE DATA
+// ================================================================
+function loadSamples() {
+  const samples = [
+    { name: 'Whole Milk',        cat: 'dairy',      qty: '2L',         days: 1  },
+    { name: 'Chicken Breast',    cat: 'meat',       qty: '500g',       days: 2  },
+    { name: 'Baby Spinach',      cat: 'produce',    qty: '200g',       days: 3  },
+    { name: 'Greek Yoghurt',     cat: 'dairy',      qty: '500g',       days: 5  },
+    { name: 'Sourdough Bread',   cat: 'pantry',     qty: '1 loaf',     days: -1 },
+    { name: 'Orange Juice',      cat: 'beverages',  qty: '1L',         days: 7  },
+    { name: 'Leftover Pasta',    cat: 'leftovers',  qty: '2 servings', days: 2  },
+    { name: 'Cheddar Cheese',    cat: 'dairy',      qty: '250g',       days: 10 },
+    { name: 'Broccoli',          cat: 'produce',    qty: '1 head',     days: 4  },
+    { name: 'Salmon Fillet',     cat: 'meat',       qty: '300g',       days: 1  },
+    { name: 'Almond Milk',       cat: 'beverages',  qty: '1L',         days: 14 },
+    { name: 'Leftover Curry',    cat: 'leftovers',  qty: '3 servings', days: 3  },
+  ];
+  samples.forEach(s => addItem(s.name, s.cat, s.qty, offsetDate(s.days), null, false));
+  renderAll();
+}
+
+// ================================================================
+//  CORE CRUD
+// ================================================================
+function addItem(name, category, quantity, expiryDate, nutrition, rerender = true) {
+  items.push({
+    id: nextId++,
+    name,
+    category,
+    quantity: quantity || '-',
+    expiryDate,
+    nutrition: nutrition || null   // { calories, protein, fat, carbs }
+  });
+  if (rerender) renderAll();
+}
+
+function deleteItem(id) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (!card) return;
+  card.style.transition = 'opacity 0.22s, transform 0.22s';
+  card.style.opacity    = '0';
+  card.style.transform  = 'scale(0.88)';
+  setTimeout(() => {
+    items = items.filter(i => i.id !== id);
+    renderAll();
+  }, 220);
+}
+
+// ================================================================
+//  RENDER
+// ================================================================
+function renderAll() {
+  renderStats();
+  renderItems();
+}
+
+function renderStats() {
+  document.getElementById('stat-total').textContent   = items.length;
+  document.getElementById('stat-soon').textContent    = items.filter(i => { const d = getDays(i.expiryDate); return d >= 0 && d <= 5; }).length;
+  document.getElementById('stat-expired').textContent = items.filter(i => getDays(i.expiryDate) < 0).length;
+}
+
+function renderItems() {
+  const grid = document.getElementById('items-grid');
+
+  let filtered = activeFilter === 'all'
+    ? [...items]
+    : items.filter(i => i.category === activeFilter);
+
+  if (activeSort === 'expiry') {
+    filtered.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+  } else if (activeSort === 'name') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else {
+    filtered.sort((a, b) => a.category.localeCompare(b.category));
+  }
+
+  document.getElementById('item-count').textContent =
+    `${filtered.length} item${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <h3>${activeFilter === 'all' ? 'Your pantry is empty' : 'No items in this category'}</h3>
+        <p>${activeFilter === 'all' ? 'Tap the + button to start tracking your groceries.' : 'Switch to a different category or add a new item.'}</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => {
+    const days   = getDays(item.expiryDate);
+    const status = getStatus(days);
+    const absD   = Math.abs(days);
+
+    let expiryBlock;
+    if (days === 0) {
+      expiryBlock = `<div class="expiry-display"><span class="today-label">Expires Today</span></div>`;
+    } else if (days < 0) {
+      expiryBlock = `<div class="expiry-display">
+        <span class="days-number">${absD}</span>
+        <span class="days-label">day${absD !== 1 ? 's' : ''} ago</span>
+      </div>`;
+    } else {
+      expiryBlock = `<div class="expiry-display">
+        <span class="days-number">${days}</span>
+        <span class="days-label">day${days !== 1 ? 's' : ''} left</span>
+      </div>`;
+    }
+
+    return `
+      <div class="item-card status-${status}" data-id="${item.id}">
+        <div class="card-top">
+          <div class="item-name">${esc(item.name)}</div>
+          <button class="delete-btn" onclick="deleteItem(${item.id})" title="Remove item">&#10005;</button>
+        </div>
+        <div><span class="category-badge cat-${item.category}">${item.category}</span></div>
+        ${expiryBlock}
+        <div class="card-footer">
+          <span class="item-quantity">${esc(item.quantity)}</span>
+          <span class="expiry-date">${fmtDate(item.expiryDate)}</span>
+        </div>
+        ${item.nutrition ? `
+        <div class="nutrition-row">
+          ${item.nutrition.calories != null ? `<span class="nut-chip"><b>${item.nutrition.calories}</b><span>kcal</span></span>` : ''}
+          ${item.nutrition.protein  != null ? `<span class="nut-chip"><b>${item.nutrition.protein}g</b><span>protein</span></span>` : ''}
+          ${item.nutrition.fat      != null ? `<span class="nut-chip"><b>${item.nutrition.fat}g</b><span>fat</span></span>` : ''}
+          ${item.nutrition.carbs    != null ? `<span class="nut-chip"><b>${item.nutrition.carbs}g</b><span>carbs</span></span>` : ''}
+        </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ================================================================
+//  FILTER / SORT
+// ================================================================
+function setFilter(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderItems();
+}
+
+function setSort(val) {
+  activeSort = val;
+  renderItems();
+}
+
+// ================================================================
+//  ADD PANEL
+// ================================================================
+function togglePanel() {
+  const panel = document.getElementById('add-panel');
+  panel.classList.contains('visible') ? closePanel() : openPanel();
+}
+
+function openPanel() {
+  document.getElementById('add-panel').classList.add('visible');
+  document.getElementById('add-overlay').classList.add('visible');
+  document.getElementById('fab').classList.add('open');
+  document.getElementById('f-expiry').value = offsetDate(7);
+  setTimeout(() => document.getElementById('f-name').focus(), 320);
+}
+
+function closePanel() {
+  document.getElementById('add-panel').classList.remove('visible');
+  document.getElementById('add-overlay').classList.remove('visible');
+  document.getElementById('fab').classList.remove('open');
+}
+
+function submitItem() {
+  const name     = document.getElementById('f-name').value.trim();
+  const cat      = document.getElementById('f-category').value;
+  const qty      = document.getElementById('f-quantity').value.trim();
+  const expiry   = document.getElementById('f-expiry').value;
+  const nameEl   = document.getElementById('f-name');
+  const expiryEl = document.getElementById('f-expiry');
+
+  nameEl.classList.remove('error');
+  expiryEl.classList.remove('error');
+
+  let ok = true;
+  if (!name)   { nameEl.classList.add('error');   nameEl.focus();   ok = false; }
+  if (!expiry) { expiryEl.classList.add('error');                   ok = false; }
+  if (!ok) return;
+
+  const cal   = parseFloat(document.getElementById('f-calories').value);
+  const prot  = parseFloat(document.getElementById('f-protein').value);
+  const fat   = parseFloat(document.getElementById('f-fat').value);
+  const carbs = parseFloat(document.getElementById('f-carbs').value);
+
+  const nutrition = (isNaN(cal) && isNaN(prot) && isNaN(fat) && isNaN(carbs))
+    ? null
+    : {
+        calories: isNaN(cal)   ? null : cal,
+        protein:  isNaN(prot)  ? null : prot,
+        fat:      isNaN(fat)   ? null : fat,
+        carbs:    isNaN(carbs) ? null : carbs
+      };
+
+  addItem(name, cat, qty || '-', expiry, nutrition);
+
+  ['f-name','f-quantity','f-calories','f-protein','f-fat','f-carbs'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  nameEl.classList.remove('error');
+  expiryEl.classList.remove('error');
+  closePanel();
+}
+
+// ================================================================
+//  DINNER GENERATOR
+// ================================================================
+async function suggestMeal() {
+  const btn     = document.getElementById('dinner-btn');
+  const content = document.getElementById('dinner-content');
+
+  const expiring = items
+    .filter(i => { const d = getDays(i.expiryDate); return d >= -1 && d <= 5; })
+    .map(i => i.name);
+
+  if (expiring.length === 0) {
+    content.innerHTML = `<div class="dinner-placeholder">Nothing is expiring in the next 5 days - great work!</div>`;
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Thinking...';
+  content.innerHTML = `
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <div style="font-size:13px;opacity:0.65">Checking what you can cook with ${expiring.length} expiring ingredient${expiring.length !== 1 ? 's' : ''}...</div>
+    </div>`;
+
+  try {
+    const response = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: apiHeaders(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `I have these ingredients expiring very soon: ${expiring.join(', ')}.
+Suggest 3 practical, achievable dinner ideas that use at least one of these ingredients along with common pantry staples.
+Respond ONLY with a valid JSON array of exactly 3 objects. No markdown. No preamble. No trailing text.
+Each object must have exactly these fields:
+- "name": string - the meal name
+- "description": string - one concise sentence describing the meal
+- "usedIngredients": array of strings - which of my listed ingredients are used`
+        }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error.message);
+
+    const raw    = data.content[0].text.trim();
+    const clean  = raw.replace(/```json|```/g, '').trim();
+    const meals  = JSON.parse(clean);
+
+    content.innerHTML = `
+      <div class="meal-cards">
+        ${meals.map(m => `
+          <div class="meal-card">
+            <div class="meal-name">${esc(m.name)}</div>
+            <div class="meal-desc">${esc(m.description)}</div>
+            <div class="meal-ingredients">
+              ${(m.usedIngredients || []).map(ing => `<span class="meal-ing-tag">${esc(ing)}</span>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>`;
+
+  } catch (err) {
+    content.innerHTML = `<div class="dinner-error">Could not generate suggestions. Check your connection and try again.</div>`;
+    console.error('Dinner suggestion error:', err);
+  }
+
+  btn.disabled    = false;
+  btn.textContent = 'Generate Ideas';
+}
+
+// ================================================================
+//  CAMERA & VISION SCANNING
+// ================================================================
+let camStream = null;
+
+async function openCamera() {
+  const overlay = document.getElementById('cam-overlay');
+  const video   = document.getElementById('cam-video');
+  const status  = document.getElementById('cam-status');
+  const hint    = document.getElementById('cam-hint');
+  const resultArea = document.getElementById('cam-result-area');
+
+  // Reset state
+  status.textContent  = '';
+  hint.textContent    = 'Point at the nutrition label or back of pack, then tap the button';
+  resultArea.innerHTML = '';
+  document.getElementById('btn-capture').disabled = false;
+  document.getElementById('cam-guide').style.display = 'block';
+
+  overlay.classList.add('visible');
+
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+    });
+    video.srcObject = camStream;
+  } catch (err) {
+    status.textContent = 'Camera access denied. Please allow camera permissions and try again.';
+    document.getElementById('btn-capture').disabled = true;
+    console.error('Camera error:', err);
+  }
+}
+
+function closeCamera() {
+  if (camStream) {
+    camStream.getTracks().forEach(t => t.stop());
+    camStream = null;
+  }
+  document.getElementById('cam-overlay').classList.remove('visible');
+  document.getElementById('cam-video').srcObject = null;
+}
+
+async function captureAndAnalyse() {
+  const video      = document.getElementById('cam-video');
+  const canvas     = document.getElementById('cam-canvas');
+  const status     = document.getElementById('cam-status');
+  const hint       = document.getElementById('cam-hint');
+  const captureBtn = document.getElementById('btn-capture');
+  const resultArea = document.getElementById('cam-result-area');
+  const guide      = document.getElementById('cam-guide');
+
+  // Draw current video frame to canvas at full resolution
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const base64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+
+  // Lock UI while analysing
+  captureBtn.disabled  = true;
+  guide.style.display  = 'none';
+  hint.textContent     = '';
+  resultArea.innerHTML = '';
+  status.innerHTML     = '<div class="cam-spinner"></div>';
+
+  try {
+    const response = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: apiHeaders(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        temperature: 0,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+            { type: 'text', text: `You are scanning a food product label. Read every word printed on this packaging carefully.
+
+Extract and return ONLY a JSON object with these fields. Use null for anything you cannot clearly read.
+
+{
+  "name": "brand and product name exactly as printed",
+  "category": "one of: dairy, meat, produce, pantry, beverages, leftovers",
+  "quantity": "net weight or volume e.g. 500g or 1L",
+  "expiryDate": "YYYY-MM-DD from any Best Before/Use By/BB/EXP date. NZ uses DD/MM/YYYY order.",
+  "calories": number in kcal (divide kJ by 4.184 if needed),
+  "protein": grams as number,
+  "fat": total fat grams as number,
+  "carbs": total carbohydrate grams as number,
+  "confidence": "high" or "medium" or "low",
+  "notes": "one sentence on anything unclear or null"
+}
+
+TODAY: ${new Date().toISOString().split('T')[0]}
+RULES: Only extract what you can actually read. No guessing. Return ONLY the JSON.` }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const raw    = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+    const result = JSON.parse(raw);
+
+    status.textContent = '';
+    showCamResult(result, resultArea, hint);
+
+  } catch (err) {
+    status.textContent = '';
+    hint.textContent   = 'Error: ' + err.message;
+    guide.style.display = 'block';
+    captureBtn.disabled = false;
+    console.error('Scan error:', err);
+  }
+}
+
+function showCamResult(r, resultArea, hint) {
+  hint.textContent = '';
+
+  const confColour = { high: '#2E9E50', medium: '#B8651A', low: '#A82828' };
+  const confLabel  = { high: 'High confidence', medium: 'Medium confidence - please verify', low: 'Low confidence - please verify carefully' };
+
+  const nutritionLines = [
+    r.calories != null ? `${r.calories} kcal` : null,
+    r.protein  != null ? `${r.protein}g protein` : null,
+    r.fat      != null ? `${r.fat}g fat` : null,
+    r.carbs    != null ? `${r.carbs}g carbs` : null,
+  ].filter(Boolean).join(' &nbsp;|&nbsp; ');
+
+  resultArea.innerHTML = `
+    <div class="cam-result-card">
+      <div class="cam-result-name">${esc(r.name || 'Unknown Item')}</div>
+      <div class="cam-result-meta">${esc(r.quantity || '')} &nbsp; ${esc(r.category || '')}</div>
+      ${r.expiryDate ? `<div class="cam-result-meta">Expires: ${fmtDate(r.expiryDate)}</div>` : '<div class="cam-result-meta" style="color:rgba(255,200,100,0.8)">Expiry date not found - set manually</div>'}
+      ${nutritionLines ? `<div class="cam-result-meta">${nutritionLines}</div>` : ''}
+      ${r.notes ? `<div class="cam-result-note">${esc(r.notes)}</div>` : ''}
+      <div class="cam-result-meta" style="color:${confColour[r.confidence] || '#999'};margin-bottom:14px;font-weight:700">${confLabel[r.confidence] || ''}</div>
+      <div class="cam-result-actions">
+        <button class="btn-use-result" onclick="applyScanResult(${JSON.stringify(r).replace(/"/g, '&quot;')})">Use This</button>
+        <button class="btn-retry" onclick="retryScan()">Scan Again</button>
+      </div>
+    </div>`;
+}
+
+function applyScanResult(r) {
+  // Fill the add panel form
+  if (r.name)     document.getElementById('f-name').value     = r.name;
+  if (r.category) document.getElementById('f-category').value = r.category;
+  if (r.quantity) document.getElementById('f-quantity').value  = r.quantity;
+  if (r.expiryDate) document.getElementById('f-expiry').value = r.expiryDate;
+  else document.getElementById('f-expiry').value = offsetDate(7);
+
+  if (r.calories != null) document.getElementById('f-calories').value = r.calories;
+  if (r.protein  != null) document.getElementById('f-protein').value  = r.protein;
+  if (r.fat      != null) document.getElementById('f-fat').value      = r.fat;
+  if (r.carbs    != null) document.getElementById('f-carbs').value    = r.carbs;
+
+  closeCamera();
+
+  // Open add panel pre-filled so user can verify before confirming
+  openPanel();
+
+  // If expiry was not found, highlight the field so user knows to set it
+  if (!r.expiryDate) {
+    setTimeout(() => {
+      const el = document.getElementById('f-expiry');
+      el.classList.add('error');
+      el.focus();
+    }, 380);
+  }
+}
+
+function retryScan() {
+  const resultArea = document.getElementById('cam-result-area');
+  const hint       = document.getElementById('cam-hint');
+  const captureBtn = document.getElementById('btn-capture');
+  const guide      = document.getElementById('cam-guide');
+
+  resultArea.innerHTML = '';
+  hint.textContent     = 'Point at the nutrition label or back of pack, then tap the button';
+  captureBtn.disabled  = false;
+  guide.style.display  = 'block';
+}
+
+// ================================================================
+//  QR CODE
+// ================================================================
+function showQR() {
+  const overlay = document.getElementById('qr-modal');
+  const urlInput = document.getElementById('qr-url-input');
+  overlay.classList.add('visible');
+  if (!urlInput.value) {
+    urlInput.value = window.location.href && window.location.href !== 'about:blank'
+      ? window.location.href
+      : 'https://freshtrack.app';
+  }
+  generateQR();
+}
+
+function generateQR() {
+  const container = document.getElementById('qr-container');
+  const url       = document.getElementById('qr-url-input').value.trim() || 'https://freshtrack.app';
+
+  const apiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=10&color=1E3D08&bgcolor=FDFAF6&data='
+    + encodeURIComponent(url);
+
+  container.innerHTML = '<div style="color:rgba(0,0,0,0.3);font-size:12px;padding:20px">Generating...</div>';
+
+  const img = new Image();
+  img.onload = () => {
+    container.innerHTML = '';
+    img.style.borderRadius = '10px';
+    img.style.border = '6px solid #EDE8DF';
+    img.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+    container.appendChild(img);
+  };
+  img.onerror = () => {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:20px">Could not generate QR code. Check your internet connection.</p>';
+  };
+  img.src = apiUrl;
+}
+
+function closeQR() {
+  document.getElementById('qr-modal').classList.remove('visible');
+}
+
+document.getElementById('qr-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeQR();
+});
+
+// ================================================================
+//  NOTIFICATIONS
+// ================================================================
+function toggleNotifBanner() {
+  if (notifEnabled) return;
+  document.getElementById('notif-banner').classList.toggle('hidden');
+}
+
+async function enableNotifications() {
+  if (!('Notification' in window)) {
+    alert('Your browser does not support desktop notifications.');
+    return;
+  }
+  const permission = await Notification.requestPermission();
+  if (permission === 'granted') {
+    notifEnabled = true;
+    document.getElementById('notif-banner').classList.add('hidden');
+    document.getElementById('notif-btn').classList.add('active-notif');
+    scheduleChecks();
+    new Notification('FreshTrack', {
+      body: 'Expiry reminders are now active!',
+      icon: ''
+    });
+  } else {
+    alert('Permission denied. You can enable notifications in your browser settings.');
+  }
+}
+
+function scheduleChecks() {
+  setInterval(() => {
+    if (!notifEnabled) return;
+    const critical = items.filter(i => { const d = getDays(i.expiryDate); return d >= 0 && d <= 1; });
+    if (critical.length > 0) {
+      new Notification('FreshTrack - Urgent Reminder', {
+        body: `${critical.map(i => i.name).join(', ')} expire${critical.length === 1 ? 's' : ''} within 24 hours!`,
+      });
+    }
+  }, 3600000); // every hour
+}
+
+// ================================================================
+//  API HELPER
+// ================================================================
+function apiHeaders() {
+  return { 'Content-Type': 'application/json' };
+}
+
+// ================================================================
+//  AUTH - localStorage-backed user accounts
+// ================================================================
+let currentUser = null;
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('ft_users') || '[]'); } catch { return []; }
+}
+
+function saveUsers(users) {
+  localStorage.setItem('ft_users', JSON.stringify(users));
+}
+
+function hashPass(pass) {
+  // Simple deterministic hash - good enough for a local demo app
+  let h = 0;
+  for (let i = 0; i < pass.length; i++) {
+    h = Math.imul(31, h) + pass.charCodeAt(i) | 0;
+  }
+  return h.toString(16);
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('auth-login').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('auth-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  clearAuthErrors();
+}
+
+function clearAuthErrors() {
+  ['login-error','signup-error'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent = '';
+    el.classList.remove('visible');
+  });
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function doLogin() {
+  const email    = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass     = document.getElementById('login-password').value;
+  const remember = document.getElementById('login-remember').checked;
+  clearAuthErrors();
+
+  if (!email || !pass) { showAuthError('login-error', 'Please fill in all fields.'); return; }
+
+  const users = getUsers();
+  const user  = users.find(u => u.email === email && u.passwordHash === hashPass(pass));
+
+  if (!user) { showAuthError('login-error', 'Incorrect email or password.'); return; }
+
+  // Store session in localStorage (persists) or sessionStorage (tab only)
+  if (remember) {
+    localStorage.setItem('ft_session', user.id);
+    sessionStorage.removeItem('ft_session');
+  } else {
+    sessionStorage.setItem('ft_session', user.id);
+    localStorage.removeItem('ft_session');
+  }
+
+  sessionLogin(user);
+}
+
+function doSignup() {
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('signup-password').value;
+  clearAuthErrors();
+
+  if (!name || !email || !pass) { showAuthError('signup-error', 'Please fill in all fields.'); return; }
+  if (pass.length < 6)          { showAuthError('signup-error', 'Password must be at least 6 characters.'); return; }
+
+  const users = getUsers();
+  if (users.find(u => u.email === email)) {
+    showAuthError('signup-error', 'An account with that email already exists.');
+    return;
+  }
+
+  const user = { id: Date.now().toString(), name, email, passwordHash: hashPass(pass) };
+  users.push(user);
+  saveUsers(users);
+  sessionLogin(user);
+}
+
+function sessionLogin(user) {
+  currentUser = user;
+
+  // Update header chip
+  document.getElementById('user-avatar').textContent       = user.name.charAt(0).toUpperCase();
+  document.getElementById('user-name-display').textContent = user.name.split(' ')[0];
+
+  // Hide auth screen
+  const overlay = document.getElementById('auth-overlay');
+  overlay.classList.add('hidden');
+  setTimeout(() => overlay.style.display = 'none', 320);
+
+  // Load this user's saved items
+  loadUserItems();
+}
+
+function doLogout() {
+  if (!confirm(`Sign out of FreshTrack?`)) return;
+  saveUserItems();
+  currentUser = null;
+  localStorage.removeItem('ft_session');
+  sessionStorage.removeItem('ft_session');
+  items  = [];
+  nextId = 1;
+  renderAll();
+
+  const overlay = document.getElementById('auth-overlay');
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '0';
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+  switchAuthTab('login');
+  document.getElementById('login-email').value    = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-remember').checked = false;
+}
+
+function saveUserItems() {
+  if (!currentUser) return;
+  localStorage.setItem(`ft_items_${currentUser.id}`, JSON.stringify({ items, nextId }));
+}
+
+function loadUserItems() {
+  if (!currentUser) return;
+  const raw = localStorage.getItem(`ft_items_${currentUser.id}`);
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      items  = data.items  || [];
+      nextId = data.nextId || 1;
+      renderAll();
+    } catch {
+      items = []; nextId = 1; renderAll();
+    }
+  } else {
+    // Brand new account - start completely empty
+    items = []; nextId = 1; renderAll();
+  }
+}
+
+// Auto-save items whenever they change
+const _origRenderAll = renderAll;
+renderAll = function() {
+  _origRenderAll();
+  saveUserItems();
+};
+
+function checkSession() {
+  const sessionId = localStorage.getItem('ft_session') || sessionStorage.getItem('ft_session');
+  if (!sessionId) return false;
+  const users = getUsers();
+  const user  = users.find(u => u.id === sessionId);
+  if (!user) return false;
+  sessionLogin(user);
+  return true;
+}
+
+// ================================================================
+//  KEYBOARD SHORTCUTS
+// ================================================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closePanel(); closeQR(); closeCamera(); }
+  if (e.key === 'Enter' && document.getElementById('add-panel').classList.contains('visible')) {
+    if (document.activeElement !== document.getElementById('f-name') &&
+        document.activeElement !== document.getElementById('f-quantity')) return;
+    submitItem();
+  }
+});
+
+// Allow Enter key on QR URL input to regenerate
+document.getElementById('qr-url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') generateQR();
+});
+
+// ================================================================
+//  INIT
+// ================================================================
+document.getElementById('f-expiry').value = offsetDate(7);
+
+// Show notifications prompt after a short delay if not yet enabled
+setTimeout(() => {
+  if (!notifEnabled && 'Notification' in window && Notification.permission !== 'granted') {
+    document.getElementById('notif-banner').classList.remove('hidden');
+  }
+}, 1800);
+
+// Enter key on login/signup fields
+document.getElementById('login-password').addEventListener('keydown',  e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-email').addEventListener('keydown',     e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('signup-password').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
+
+// Check for existing session - if none, the auth overlay stays visible
+if (!checkSession()) {
+  // Auth screen is already showing by default - nothing extra needed
+  // Do NOT call loadSamples() here; that happens after login
+}
+</script>
+</body>
+</html>
